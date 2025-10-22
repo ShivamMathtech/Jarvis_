@@ -1,34 +1,19 @@
-import speech_recognition as sr
-import pyttsx3
-
-# Initialize TTS engine
-engine = pyttsx3.init()
-engine.setProperty('rate', 150)  # Adjust speaking speed
-
-# Start the non-blocking loop once
-engine.startLoop(False)  # Non-blocking loop
+from gtts import gTTS
+import base64
+import tempfile
+import streamlit as st
 
 def speak(text):
-    """Speak text safely in Streamlit without blocking."""
-    engine.say(text)
-    engine.iterate()  # Non-blocking iteration
+    """
+    Converts text to speech and plays it automatically in Streamlit.
+    """
+    tts = gTTS(text=text, lang="en")
+    
+    # Save to a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
+        tts.save(fp.name)
+        audio_file_path = fp.name
 
-def listen_command(duration=5):
-    """Listen to microphone input and return recognized text"""
-    recognizer = sr.Recognizer()
-    try:
-        with sr.Microphone() as source:
-            print("Listening...")
-            recognizer.adjust_for_ambient_noise(source, duration=0.5)
-            audio = recognizer.listen(source, timeout=duration)
-            command = recognizer.recognize_google(audio)
-            return command
-    except sr.RequestError:
-        print("⚠️ Could not request results from Google Speech Recognition service")
-        return None
-    except sr.UnknownValueError:
-        print("⚠️ Could not understand audio")
-        return None
-    except OSError:
-        print("⚠️ Microphone not found")
-        return None
+    # Streamlit audio player (auto-play)
+    audio_bytes = open(audio_file_path, "rb").read()
+    st.audio(audio_bytes, format="audio/mp3", start_time=0)
