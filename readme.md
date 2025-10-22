@@ -33,6 +33,7 @@ streamlit run main.py
 
 ## Folder Structure
 
+```
 JarvisAI/
 │
 ├─ main.py
@@ -44,3 +45,4 @@ JarvisAI/
 │ ├─ animation.py
 │ └─ system_control.py
 └─ README.md
+```
